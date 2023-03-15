@@ -24,12 +24,11 @@ namespace MusicDAL.Models
         /// <summary>
         /// Gets or sets the disc number.
         /// </summary>
-        public int DiscNumber { get; set; }
+        public int? DiscNumber { get; set; }
 
         /// <summary>
         /// Gets or sets the track name from filename.
         /// </summary>
-        [Required]
         public string? Name { get; set; }
 
         /// <summary>
@@ -40,7 +39,7 @@ namespace MusicDAL.Models
         /// <summary>
         /// Gets or sets the year recorded.
         /// </summary>
-        public int Recorded { get; set; }
+        public int? Recorded { get; set; }
 
         /// <summary>
         /// Gets or sets the length of a track in minutes and seconds.
@@ -50,27 +49,27 @@ namespace MusicDAL.Models
         /// <summary>
         /// Gets or sets the duration of a track in timespan.
         /// </summary>
-        public TimeSpan Duration { get; set; }
+        public TimeSpan? Duration { get; set; }
 
         /// <summary>
         /// Gets or sets the bits.
         /// </summary>
-        public int Bits { get; set; }
+        public int? Bits { get; set; }
 
         /// <summary>
         /// Gets or sets the bit rate.
         /// </summary>
-        public int BitRate { get; set; }
+        public int? BitRate { get; set; }
 
         /// <summary>
         /// Gets or sets the audio sample rate.
         /// </summary>
-        public int AudioSampleRate { get; set; }
+        public int? AudioSampleRate { get; set; }
 
         /// <summary>
         /// Gets or sets the audio channels.
         /// </summary>
-        public int AudioChannels { get; set; }
+        public int? AudioChannels { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the music file.
@@ -95,7 +94,7 @@ namespace MusicDAL.Models
         /// <summary>
         /// Gets or sets the track number.
         /// </summary>
-        public int Number { get; set; }
+        public int? Number { get; set; }
 
         /// <summary>
         /// Gets or sets the full directory and name.

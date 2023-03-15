@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using System.Numerics;
 
 namespace MusicDAL.Data
 {
@@ -66,6 +67,7 @@ namespace MusicDAL.Data
                     {
                         bulkCopy.BatchSize = 1000;
                         bulkCopy.DestinationTableName = "dbo.Disc";
+                        bulkCopy.ColumnMappings.Clear();
                         bulkCopy.ColumnMappings.Add("DiscId", "DiscId");
                         bulkCopy.ColumnMappings.Add("RecordId", "RecordId");
                         bulkCopy.ColumnMappings.Add("Name", "Name");
@@ -74,6 +76,7 @@ namespace MusicDAL.Data
                         bulkCopy.ColumnMappings.Add("Length", "Length");
                         bulkCopy.ColumnMappings.Add("Duration", "Duration");
                         bulkCopy.ColumnMappings.Add("Folder", "Folder");
+
                         try
                         {
                             DataTable dataTable = new DataTable();
@@ -85,6 +88,7 @@ namespace MusicDAL.Data
                             dataTable.Columns.Add("Length", typeof(string));
                             dataTable.Columns.Add("Duration", typeof(TimeSpan));
                             dataTable.Columns.Add("Folder", typeof(string));
+
                             foreach (Disk disc in discs)
                             {
                                 DataRow row = dataTable.NewRow();
@@ -94,10 +98,11 @@ namespace MusicDAL.Data
                                 row["SubTitle"] = disc.SubTitle;
                                 row["DiscNumber"] = disc.DiscNumber;
                                 row["Length"] = disc.Length;
-                                row["Duration"] = disc.Duration;
+                                row["Duration"] = disc.Duration.Ticks;
                                 row["Folder"] = disc.Folder;
                                 dataTable.Rows.Add(row);
                             }
+
                             bulkCopy.WriteToServer(dataTable);
                             transaction.Commit();
                         }
@@ -110,6 +115,62 @@ namespace MusicDAL.Data
                 }
             }
         }
+
+        //public static void BulkInsert(List<Disk> discs)
+        //{
+        //    using (SqlConnection cn = new SqlConnection(AppSettings.Instance.ConnectString))
+        //    {
+        //        cn.Open();
+        //        using (SqlTransaction transaction = cn.BeginTransaction())
+        //        {
+        //            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(cn, SqlBulkCopyOptions.Default, transaction))
+        //            {
+        //                bulkCopy.BatchSize = 1000;
+        //                bulkCopy.DestinationTableName = "dbo.Disc";
+        //                bulkCopy.ColumnMappings.Add("DiscId", "DiscId");
+        //                bulkCopy.ColumnMappings.Add("RecordId", "RecordId");
+        //                bulkCopy.ColumnMappings.Add("Name", "Name");
+        //                bulkCopy.ColumnMappings.Add("SubTitle", "SubTitle");
+        //                bulkCopy.ColumnMappings.Add("DiscNumber", "DiscNumber");
+        //                bulkCopy.ColumnMappings.Add("Length", "Length");
+        //                bulkCopy.ColumnMappings.Add("Duration", "Duration");
+        //                bulkCopy.ColumnMappings.Add("Folder", "Folder");
+        //                try
+        //                {
+        //                    DataTable dataTable = new DataTable();
+        //                    dataTable.Columns.Add("DiscId", typeof(int));
+        //                    dataTable.Columns.Add("RecordId", typeof(int));
+        //                    dataTable.Columns.Add("Name", typeof(string));
+        //                    dataTable.Columns.Add("SubTitle", typeof(string));
+        //                    dataTable.Columns.Add("DiscNumber", typeof(int));
+        //                    dataTable.Columns.Add("Length", typeof(string));
+        //                    dataTable.Columns.Add("Duration", typeof(BigInteger));
+        //                    dataTable.Columns.Add("Folder", typeof(string));
+        //                    foreach (Disk disc in discs)
+        //                    {
+        //                        DataRow row = dataTable.NewRow();
+        //                        row["DiscId"] = disc.DiscId;
+        //                        row["RecordId"] = disc.RecordId;
+        //                        row["Name"] = disc.Name;
+        //                        row["SubTitle"] = disc.SubTitle;
+        //                        row["DiscNumber"] = disc.DiscNumber;
+        //                        row["Length"] = disc.Length;
+        //                        row["Duration"] = disc.Duration.Ticks;
+        //                        row["Folder"] = disc.Folder;
+        //                        dataTable.Rows.Add(row);
+        //                    }
+        //                    bulkCopy.WriteToServer(dataTable);
+        //                    transaction.Commit();
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    transaction.Rollback();
+        //                    throw ex;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         #endregion
     }

@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using FastMember;
 using MusicDAL.Components;
 using MusicDAL.Models;
 using System;
@@ -37,56 +38,34 @@ namespace MusicDAL.Data
 
         public static void BulkInsert(List<Artist> artists)
         {
-            using (var cn = new SqlConnection(AppSettings.Instance.ConnectString))
+            using (SqlConnection cn = new SqlConnection(AppSettings.Instance.ConnectString))
             {
                 cn.Open();
 
-                using (var transaction = cn.BeginTransaction())
+                // Create a SqlBulkCopy object
+                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(cn))
                 {
-                    try
+                    bulkCopy.DestinationTableName = "Artist";
+
+                    // Use FastMember to create an ObjectReader from the list of Atist objects
+                    // Install-Package FastMember
+                    using (ObjectReader reader = ObjectReader.Create(artists))
                     {
-                        // Create a DataTable to hold the artist data
-                        var dataTable = new DataTable();
-                        dataTable.Columns.Add("ArtistId", typeof(int));
-                        dataTable.Columns.Add("FirstName", typeof(string));
-                        dataTable.Columns.Add("LastName", typeof(string));
-                        dataTable.Columns.Add("Name", typeof(string));
-                        dataTable.Columns.Add("Biography", typeof(string));
-                        dataTable.Columns.Add("Folder", typeof(string));
-                        dataTable.Columns.Add("RecordArtistId", typeof(int));
-
-                        // Add each artist to the DataTable
-                        foreach (var artist in artists)
-                        {
-                            dataTable.Rows.Add(
-                                artist.ArtistId,
-                                artist.FirstName,
-                                artist.LastName,
-                                artist.Name,
-                                artist.Biography,
-                                artist.Folder,
-                                artist.RecordArtistId
-                            );
-                        }
-
-                        // Use a SQL Server table-valued parameter to bulk insert the artists
-                        var command = new SqlCommand("adm_InsertArtists", cn, transaction);
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@artists", dataTable);
-                        command.ExecuteNonQuery();
-
-                        // Commit the transaction
-                        transaction.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        // Roll back the transaction if an error occurs
-                        transaction.Rollback();
-                        throw new Exception("Error occurred while bulk inserting artists", ex);
+                        // Set up the column mappings between the ObjectReader and the SQL Server table
+                        bulkCopy.ColumnMappings.Add("ArtistId", "ArtistId");
+                        bulkCopy.ColumnMappings.Add("FirstName", "FirstName");
+                        bulkCopy.ColumnMappings.Add("LastName", "LastName");
+                        bulkCopy.ColumnMappings.Add("Name", "Name");
+                        bulkCopy.ColumnMappings.Add("Biography", "Biography");
+                        bulkCopy.ColumnMappings.Add("Folder", "Folder");
+                        bulkCopy.ColumnMappings.Add("RecordArtistId", "RecordArtistId");
+                        // Write the data to the SQL Server table
+                        bulkCopy.WriteToServer(reader);
                     }
                 }
             }
         }
+
         #endregion
     }
 }
