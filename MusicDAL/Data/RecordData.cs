@@ -11,7 +11,7 @@ using Dapper;
 
 namespace MusicDAL.Data
 {
-    public class _td
+    public class RecordData
     {
         #region " Methods "
 

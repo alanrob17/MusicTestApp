@@ -79,6 +79,30 @@ namespace MusicDAL.Data
             }
         }
 
+        public static void UpdateTrackName(Track track)
+        {
+            using (IDbConnection cn = new SqlConnection(AppSettings.Instance.ConnectString))
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@TrackId", track.TrackId);
+                parameters.Add("@Name", track.Name);
+
+                cn.Execute("db_UpdateTrackName", parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public static void UpdateTitleName(Track track)
+        {
+            using (IDbConnection cn = new SqlConnection(AppSettings.Instance.ConnectString))
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@TrackId", track.TrackId);
+                parameters.Add("@Title", track.Title);
+
+                cn.Execute("db_UpdateTrackTitle", parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
         #endregion
     }
 }
