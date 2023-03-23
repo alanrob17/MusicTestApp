@@ -7,6 +7,7 @@ using _ad = MusicDAL.Data.ArtistData;
 using _rd = MusicDAL.Data.RecordData;
 using _dd = MusicDAL.Data.DiskData;
 using _td = MusicDAL.Data.TrackData;
+using System.Text.RegularExpressions;
 
 namespace MusicTest
 {
@@ -49,10 +50,15 @@ namespace MusicTest
             // FixNames(namesDictionary);
             //// end.
             //// Fix faulty Title fields
-            Dictionary<int, string> titlesDictionary = ReadInFaultyTracks();
+            //Dictionary<int, string> titlesDictionary = ReadInFaultyTracks();
 
-            FixTitles(titlesDictionary);
+            //FixTitles(titlesDictionary);
             //// end.
+
+            //// Find all faulty numbered tracks
+            ListAllFaultyTracks();
+            //// end.
+
             //List<Track> tracks = new();
             //tracks = _td.DeserialiseTracks(tracks);
 
@@ -66,6 +72,22 @@ namespace MusicTest
 
             // I have the Bulk inserts working. Now I need to clean and update the data using routines in MusicBDAPI
 
+        }
+
+        private static void ListAllFaultyTracks()
+        {
+            List<Track> tracks = new List<Track>();
+            tracks = _td.GetTracks();
+
+            foreach (Track track in tracks)
+            {
+                var name = Path.GetFileName(track.Folder);
+                Regex numberDashRegex = new Regex(@"^\d{2,3}\s-\s");
+                if (!numberDashRegex.IsMatch(name))
+                {
+                    Console.WriteLine($"{track.Artist}: {track.Album} - {track.Folder}");
+                }
+            }
         }
 
         private static void CreateFaultyTrackList()
